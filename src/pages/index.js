@@ -1,46 +1,54 @@
-import { useEffect, useRef, useState } from 'react'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useEffect, useRef, useState } from "react";
+import { useLazyQuery, useQuery } from "@apollo/client";
 
-import Head from 'next/head'
-import { Button, Container, Grid, Input, Spacer, User, Row, Loading } from "@nextui-org/react"
+import Head from "next/head";
+import {
+  Button,
+  Container,
+  Grid,
+  Input,
+  Spacer,
+  User,
+  Row,
+  Loading,
+} from "@nextui-org/react";
 
-import GET_USERS from '@/graphql/queries/getUsers.gql'
-import SEARCH_USERS from '@/graphql/queries/searchUsers.gql'
+import GET_USERS from "@/graphql/queries/getUsers.gql";
+import SEARCH_USERS from "@/graphql/queries/searchUsers.gql";
 
 export default function Home() {
-  const [users, setUsers] = useState([])
-  const [searchValue, setSearchValue] = useState('')
+  const [users, setUsers] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
 
-  const usersRef = useRef(null)
+  const usersRef = useRef(null);
 
-  const { data, loading, error } = useQuery(GET_USERS)
+  const { data, loading, error } = useQuery(GET_USERS);
 
   const [getSearchedUsers] = useLazyQuery(SEARCH_USERS, {
-    fetchPolicy: 'network-only',
+    fetchPolicy: "network-only",
     onCompleted(data) {
-      setUsers(data.searchUser)
-    }
-  })
+      setUsers(data.searchUser);
+    },
+  });
 
   useEffect(() => {
     if (data) {
-      setUsers(data.users)
-      usersRef.current = data.users
+      setUsers(data.users);
+      usersRef.current = data.users;
     }
-  }, [data])
-
+  }, [data]);
 
   const searchUser = () => {
     getSearchedUsers({
       variables: {
-        value: searchValue
-      }
-    })
-  }
+        value: searchValue,
+      },
+    });
+  };
 
   if (error) {
-    console.error(error)
-    return null
+    console.error(error);
+    return null;
   }
 
   return (
@@ -51,12 +59,13 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main >
-
-        <Container css={{ display: 'flex', justifyContent: 'center' }}>
+      <main>
+        <Container css={{ display: "flex", justifyContent: "center" }}>
           <Spacer y={2.5} />
           <Row justify="center" align="center">
-
+            <h1>nextjs-graphql-server-client</h1>
+          </Row>
+          <Row justify="center" align="center">
             <Input
               clearable
               labelPlaceholder="User"
@@ -71,17 +80,12 @@ export default function Home() {
 
           <Spacer y={2.5} />
           <Row justify="center" align="center">
-
-            {loading
-              ?
+            {loading ? (
               <Loading />
-              :
+            ) : (
               <Grid.Container gap={2} justify="center">
-                {users.map(u => (
-                  <Grid
-                    xs={12} sm={6} lg={3}
-                    key={u.id}
-                  >
+                {users.map((u) => (
+                  <Grid xs={12} sm={6} lg={3} key={u.id}>
                     <User
                       src={u.image}
                       name={`${u.firstName}${u.lastName}`}
@@ -91,15 +95,12 @@ export default function Home() {
                       color="gradient"
                     />
                   </Grid>
-
-                ))
-                }
+                ))}
               </Grid.Container>
-            }
-
+            )}
           </Row>
         </Container>
       </main>
     </>
-  )
+  );
 }
